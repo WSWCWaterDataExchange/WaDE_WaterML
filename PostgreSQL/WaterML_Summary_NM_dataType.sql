@@ -1,3 +1,13 @@
+/*
+SELECT "WADE_R"."XML_WaterML_USEME"(
+    'RG',
+    'NMOSE',
+    'AVAILABILITY'
+);
+
+
+*/
+
 -- Function: "WADE_R"."XML_WaterML_USEME"(character varying, character varying, character varying)
 
 -- DROP FUNCTION "WADE_R"."XML_WaterML_USEME"(character varying, character varying, character varying);

@@ -1,11 +1,11 @@
--- Function: "WADE_R"."XML_WaterMLUSGS2"(character varying, character varying, character varying)
+-- Function: "WADE_R"."XML_WaterMLUSGS_final"(character varying, character varying, character varying)
 
--- DROP FUNCTION "WADE_R"."XML_WaterMLUSGS2"(character varying, character varying, character varying);
+-- DROP FUNCTION "WADE_R"."XML_WaterMLUSGS_final"(character varying, character varying, character varying);
 
-CREATE OR REPLACE FUNCTION "WADE_R"."XML_WaterMLUSGSNEWax"(
+CREATE OR REPLACE FUNCTION "WADE_R"."XML_WaterMLUSGS_final"(
     IN loctxt character varying,
     IN orgid character varying,
-    IN USGS_WaterUse_Category character varying,
+    IN usgs_wateruse_category character varying,
     OUT text_output xml)
   RETURNS xml AS
 $BODY$
@@ -20,7 +20,6 @@ BEGIN
 namespace:='http://www.opengis.net/waterml/2.0';
 
 /*
-There is an issue here as the query returns other datatypes besides "USE"
 
 
 SELECT "WADE_R"."XML_WaterMLUSGSNEWax"
@@ -31,12 +30,7 @@ SELECT "WADE_R"."XML_WaterMLUSGSNEWax"
 );
 
 
-
 */
-
-
-
-
 text_output:=(SELECT STRING_AGG
 	(XMLELEMENT
 	  (name "wml2:WaDEWaterML", XMLATTRIBUTES(namespace as "xmlns:wml2"),
@@ -85,7 +79,7 @@ text_output:=(SELECT STRING_AGG
 	ON (E."REPORT_UNIT_ID" =A."REPORT_UNIT_ID" AND E."REPORT_ID"=A."REPORT_ID")
 
 	LEFT OUTER JOIN "WADE_R"."CATALOG_SUMMARY" F
-	ON (F."REPORT_UNIT_ID" =A."REPORT_UNIT_ID" AND F."REPORT_ID"=A."REPORT_ID")
+	ON (F."REPORT_UNIT_ID" =A."REPORT_UNIT_ID" AND F."REPORT_ID"=A."REPORT_ID" AND F."DATATYPE"='USE' AND F."DATACATEGORY"='SUMMARY')
 
 	LEFT OUTER JOIN "WADE"."S_USE_AMOUNT" G 
 	ON (G."REPORT_UNIT_ID" =A."REPORT_UNIT_ID" AND G."REPORT_ID"=A."REPORT_ID" AND G."SUMMARY_SEQ"=A."SUMMARY_SEQ" AND
@@ -99,7 +93,8 @@ text_output:=(SELECT STRING_AGG
 	
 	WHERE  A."REPORT_UNIT_ID"=loctxt AND A."ORGANIZATION_ID"=orgid AND B."USGS_WaterUse_Category"=USGS_WaterUse_Category
 
-	GROUP BY "USGS_WaterUse_Category");
+	--GROUP BY "USGS_WaterUse_Category"
+);
 
 
 
@@ -109,5 +104,5 @@ END
   $BODY$
   LANGUAGE plpgsql STABLE
   COST 1000;
-ALTER FUNCTION "WADE_R"."XML_WaterMLUSGSNEWax"(character varying, character varying, character varying)
+ALTER FUNCTION "WADE_R"."XML_WaterMLUSGS_final"(character varying, character varying, character varying)
   OWNER TO postgres;

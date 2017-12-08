@@ -22,6 +22,16 @@ namespace:='http://www.opengis.net/waterml/2.0';
 /*
 There is an issue here as the query returns other datatypes besides "USE"
 
+
+SELECT "WADE_R"."XML_WaterMLUSGSNEWax"
+(
+    'RG',
+    'NMOSE',
+    'Water Use, Irrigation'
+);
+
+
+
 */
 
 

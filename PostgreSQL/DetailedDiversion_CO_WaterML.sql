@@ -12,7 +12,10 @@ SELECT "WADE_R"."XML_WaterML_Detailed"(
     '4306139' -- DiversionID
 );
 
-*/
+
+-- Function: "WADE_R"."XML_WaterML_Detailed"(character varying, character varying)
+
+-- DROP FUNCTION "WADE_R"."XML_WaterML_Detailed"(character varying, character varying);
 
 CREATE OR REPLACE FUNCTION "WADE_R"."XML_WaterML_Detailed"(
     IN orgid character varying,
@@ -25,7 +28,13 @@ DECLARE
 
 namespace character varying;
 
+/*
+SELECT "WADE_R"."XML_WaterML_Detailed"(
+    'CODWR',  -- Organization ID
+    '4306139' -- DiversionID
+);
 
+*/
 BEGIN
 
 namespace:='http://www.opengis.net/waterml/2.0';
@@ -38,7 +47,7 @@ text_output:=(SELECT STRING_AGG
 	  	    (
 	  	     "DIVERSION_NAME" AS "wml2:SiteName",--site name
 		     A."DIVERSION_ID" AS "wml2:SiteCode",-- site code
-     		     'Diversion' As "wml2:VariableName",--Variable Name
+     		     DL."DATATYPE" As "wml2:VariableName",--Variable Name
       		     'IrigationYear' AS "wml2:YearType",-- YearType: Irrigation Year, Water Year, Calendar Year. Each has a start and end months
       		     B."AMOUNT_VOLUME" AS "wml2:VolumeValue",-- Data value
 		     U."VALUE" AS "wml2:VolumeUnit",-- Volume variable unit 
@@ -58,8 +67,7 @@ text_output:=(SELECT STRING_AGG
     		     'cumulative' As "wml2:AggregationStatistic",--AggregationStatistic
     		     '1' As "wml2:AggregationInterval",--AggregationInterval
     		     'year' As "wml2:AggregationIntervalUnit",--unit
-    		     I."ORGANIZATION_NAME" As "wml2:Organization"--Organization	
-	
+    		     I."ORGANIZATION_NAME" As "wml2:Organization"--Organization		
 )
 			 )
            )::text,''                         
@@ -77,6 +85,10 @@ text_output:=(SELECT STRING_AGG
 
     	LEFT OUTER JOIN "WADE"."ORGANIZATION" I  
     	ON (B."ORGANIZATION_ID" =I."ORGANIZATION_ID")
+
+	LEFT OUTER JOIN "WADE_R"."DETAIL_LOCATION" DL 
+	ON (B."ALLOCATION_ID"=DL."ALLOCATION_ID"AND B."ORGANIZATION_ID" =DL."ORGANIZATION_ID" AND B."REPORT_ID"=DL."REPORT_ID")
+  	
 
 	LEFT OUTER JOIN "WADE"."LU_UNITS" U
 	ON (U."LU_SEQ_NO"=B."UNIT_VOLUME")

@@ -1,18 +1,6 @@
 --Adel Abdalah and Sara Larsen 
 --Dec 2017
 
-
--- Function: "WADE_R"."XML_WaterML_Detailed"(character varying, character varying)
-
--- DROP FUNCTION "WADE_R"."XML_WaterML_Detailed"(character varying, character varying);
-
-/*
-SELECT "WADE_R"."XML_WaterML_Detailed"(
-    'CODWR',  -- Organization ID
-    '4306139' -- DiversionID
-);
-
-
 -- Function: "WADE_R"."XML_WaterML_Detailed"(character varying, character varying)
 
 -- DROP FUNCTION "WADE_R"."XML_WaterML_Detailed"(character varying, character varying);
@@ -51,6 +39,7 @@ text_output:=(SELECT STRING_AGG
       		     'IrigationYear' AS "wml2:YearType",-- YearType: Irrigation Year, Water Year, Calendar Year. Each has a start and end months
       		     B."AMOUNT_VOLUME" AS "wml2:VolumeValue",-- Data value
 		     U."VALUE" AS "wml2:VolumeUnit",-- Volume variable unit 
+		     BU."DESCRIPTION" AS "wml2:BeneficialUse",--LU_BENEFICIAL_USE
 
 	             --These two are commented out because there is no data for them in the CO db  
       		     --B."AMOUNT_RATE" AS "wml2:FlowValue",-- Volume Data value
@@ -88,7 +77,6 @@ text_output:=(SELECT STRING_AGG
 
 	LEFT OUTER JOIN "WADE_R"."DETAIL_LOCATION" DL 
 	ON (B."ALLOCATION_ID"=DL."ALLOCATION_ID"AND B."ORGANIZATION_ID" =DL."ORGANIZATION_ID" AND B."REPORT_ID"=DL."REPORT_ID")
-  	
 
 	LEFT OUTER JOIN "WADE"."LU_UNITS" U
 	ON (U."LU_SEQ_NO"=B."UNIT_VOLUME")
@@ -102,6 +90,12 @@ text_output:=(SELECT STRING_AGG
 
 	LEFT OUTER JOIN "WADE"."D_DIVERSION_FLOW" DF 
 	ON (B."DIVERSION_ID"=DF."DIVERSION_ID" AND B."ORGANIZATION_ID" =DF."ORGANIZATION_ID" AND B."REPORT_ID"=DF."REPORT_ID" AND B."DETAIL_SEQ_NO"=DF."DETAIL_SEQ_NO")
+
+	LEFT OUTER JOIN "WADE"."D_DIVERSION_USE" DU 
+	ON (DF."DIVERSION_ID"=DU."DIVERSION_ID" AND DF."ORGANIZATION_ID" =DU."ORGANIZATION_ID" AND DF."REPORT_ID"=DU."REPORT_ID" AND DF."DETAIL_SEQ_NO"=DU."DETAIL_SEQ_NO")
+
+	LEFT OUTER JOIN "WADE"."LU_BENEFICIAL_USE" BU 
+	ON (DU."BENEFICIAL_USE_ID"=BU."LU_SEQ_NO") 
 
 	LEFT OUTER JOIN "WADE"."LU_FRESH_SALINE_INDICATOR" FSI 
 	ON (DF."FRESH_SALINE_IND"=FSI."LU_SEQ_NO")
